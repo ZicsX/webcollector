@@ -20,30 +20,33 @@ class AsyncSpider(scrapy.Spider):
         self.start_urls = [url]
         parsed_uri = urlparse(url)
         self.domain = "{uri.netloc}".format(uri=parsed_uri)  # Extract domain
-        self.folder_path = os.path.join(os.getcwd(),'collect_data', self.domain)  # Folder path
+        self.folder_path = os.path.join(os.getcwd(), 'collect_data', self.domain)  # Folder path
         if not os.path.exists(self.folder_path):
             os.makedirs(self.folder_path)
         self.csv_file_path = os.path.join(self.folder_path, "links.csv")
-        with open(self.csv_file_path, "w", newline="") as csv_file:
-            writer = csv.writer(csv_file)
-            writer.writerow(["URL", "Filename"])  # Writing headers
+        if not os.path.exists(self.csv_file_path):
+            with open(self.csv_file_path, "w", newline="") as csv_file:
+                writer = csv.writer(csv_file)
+                writer.writerow(["URL", "Filename"])  # Writing headers
 
     def parse(self, response):
+        # Extract data and save for the current page
+        self.save_data(response)
+
+        # Get links from the current page and follow them
         for link in response.css("a::attr(href)").getall():
             link = response.urljoin(link)
             if urlparse(link).netloc == self.domain:
                 yield scrapy.Request(link, callback=self.parse)
 
-            extracted_data = trafilatura.extract(response.text)
-            if extracted_data:
+    def save_data(self, response):
+        extracted_data = trafilatura.extract(response.text)
+        if extracted_data:
+            filename = f"{uuid.uuid4()}.txt"
+            file_path = os.path.join(self.folder_path, filename)
+            with open(file_path, "w", encoding="utf-8") as file:
+                file.write(extracted_data)
 
-                filename = f"{uuid.uuid4()}.txt"
-                file_path = os.path.join(self.folder_path, filename)
-                with open(file_path, "w", encoding="utf-8") as file:
-                    file.write(extracted_data)
-
-                with open(self.csv_file_path, "a", newline="") as csv_file:
-                    writer = csv.writer(csv_file)
-                    writer.writerow([link, filename])
-
-            yield {"link": link}
+            with open(self.csv_file_path, "a", newline="") as csv_file:
+                writer = csv.writer(csv_file)
+                writer.writerow([response.url, filename])
