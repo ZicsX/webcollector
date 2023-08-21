@@ -17,7 +17,10 @@ NEWSPIDER_MODULE = "webcollect.spiders"
 #USER_AGENT = "webcollect (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
+
+DOWNLOAD_DELAY = 0.1
+CONCURRENT_REQUESTS = 100
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
