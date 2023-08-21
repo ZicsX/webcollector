@@ -1,3 +1,8 @@
 scrapy
 aiohttp
 trafilatura
+Django
+requests
+django-channels
+celery
+django-celery-results

@@ -1,4 +1,9 @@
 env/
-*/__pycache__/
-*/*/__pycache__/
 test.ipynb
+**/__pycache__
+__pycache__
+.env
+*/migrations/*
+!*/migrations/__init__.py
+db.sqlite3
+collect_data/*

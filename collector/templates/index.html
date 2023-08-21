@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Collector</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Web Collector</h1>
+
+    <label for="domain">Enter domain:</label>
+    <input type="text" id="domain" name="domain">
+    <button id="start">Start Crawling</button>
+    <br><br>
+
+    <div id="status">
+        Status: <span id="statusText">Idle</span>
+    </div>
+    <a href="#" id="downloadLink" style="display: none;">Download Zip</a>
+
+    <script>
+        $(document).ready(function() {
+            $("#start").click(function() {
+                const domain = $("#domain").val();
+                if (domain) {
+                    $.get(`/start_crawl/?domain=${domain}`, function(data) {
+                        if (data.status === "RUNNING") {
+                            $("#statusText").text("Crawling...");
+                            checkStatus(domain);
+                        } else if (data.status === "COMPLETED") {
+                            $("#statusText").text("Completed");
+                            $("#downloadLink").show().attr('href', `/start_crawl/?domain=${domain}`);
+                        }
+                    });
+                } else {
+                    alert("Please enter a domain!");
+                }
+            });
+        });
+
+        function checkStatus(domain) {
+            const hash = new TextEncoder().encode(domain);
+            const digest = window.crypto.subtle.digest('SHA-256', hash);
+
+            digest.then(res => {
+                const hashArray = Array.from(new Uint8Array(res));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                $.get(`/check_status/${hashHex}/`, function(data) {
+                    if (data.status === "RUNNING") {
+                        setTimeout(() => {
+                            checkStatus(domain);
+                        }, 5000);
+                    } else if (data.status === "COMPLETED") {
+                        $("#statusText").text("Completed");
+                        $("#downloadLink").show().attr('href', `/start_crawl/?domain=${domain}`);
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
