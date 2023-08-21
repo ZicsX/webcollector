@@ -6,6 +6,11 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import os
+import django
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'webcollector.settings'
+django.setup()
 
 BOT_NAME = "webcollect"
 
