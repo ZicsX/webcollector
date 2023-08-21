@@ -27,12 +27,14 @@ def start_crawl(request):
                     for foldername, subfolders, filenames in os.walk(folder_path):
                         for filename in filenames:
                             file_path = os.path.join(foldername, filename)
-                            zipf.write(file_path, os.path.relpath(file_path, settings.BASE_DIR))
-            
+                            arcname = os.path.relpath(file_path, folder_path)
+                            zipf.write(file_path, arcname=arcname)
+
             with open(zip_filename, 'rb') as zipf:
                 response = HttpResponse(zipf.read(), content_type="application/zip")
                 response['Content-Disposition'] = f'attachment; filename={domain}.zip'
                 return response
+
 
         # If instance exists but still running
         return JsonResponse({"status": "RUNNING", "message": "Crawl is still running."})
