@@ -81,3 +81,18 @@ Now, visit `http://127.0.0.1:8000/` in your browser to access the Web Collector 
 3. Monitor the status. Once completed, a download link for a zip file containing the extracted data will appear.
 
 ---
+Of course! Let's add a section on how to directly run the Scrapy spider without the Django interface:
+
+---
+
+### **Directly Running the Scrapy Spider:**
+
+If you'd like to bypass the Django application and run the Scrapy spider directly, you can use the following command:
+
+```bash
+scrapy crawl async_spider -a url=YOUR_DOMAIN_HERE
+```
+
+Replace `YOUR_DOMAIN_HERE` with the domain you want to crawl. The extracted textual content will be saved in a folder named after the domain inside 'collect_data', and links will be saved in a `links.csv` file within the same folder.
+
+---
