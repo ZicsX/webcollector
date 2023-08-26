@@ -6,3 +6,6 @@ requests
 django-channels
 celery
 django-celery-results
+sqlalchemy
+cx_Oracle
+boto3
