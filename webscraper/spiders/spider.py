@@ -5,6 +5,19 @@ from urllib.parse import urlparse, urlsplit, urlunsplit
 
 class WebsiteCrawlerSpider(scrapy.Spider):
     name = "website_crawler"
+    custom_settings = {
+        "CONCURRENT_REQUESTS": 100,
+        "DOWNLOAD_DELAY": 0,
+        "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
+        "ROBOTSTXT_OBEY": True,
+        "ITEM_PIPELINES": {
+            "webscraper.extraction_pipeline.ExtractionPipeline": 100,
+            # "webscraper.s3_storage_pipeline.S3StoragePipeline": 200,
+            # "webscraper.database_pipeline.DatabasePipeline": 300,
+            'webscraper.save_text_pipeline.SaveTextPipeline': 200,
+            'webscraper.log_csv_pipeline.LogToCsvPipeline': 300,
+        },
+    }
 
     def __init__(self, target_url, *args, **kwargs):
         super(WebsiteCrawlerSpider, self).__init__(*args, **kwargs)
