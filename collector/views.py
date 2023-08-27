@@ -3,16 +3,19 @@ from collector.models import DomainCrawl
 import hashlib
 import os
 import zipfile
-from .tasks import scrape_website
+from .tasks import run_spider
 from django.shortcuts import render
 from django.conf import settings
+from urllib.parse import urlparse
+
 
 def index(request):
     return render(request, 'index.html')
 
 def start_crawl(request):
-    domain = request.GET.get('domain')
-    hash_value = hashlib.sha256(domain.encode()).hexdigest()
+    target_url = request.GET.get('domain')
+    domain = urlparse(target_url).netloc
+    hash_value = hashlib.sha256(target_url.encode()).hexdigest()
 
     try:
         crawl_instance = DomainCrawl.objects.get(hash_value=hash_value)
@@ -20,9 +23,9 @@ def start_crawl(request):
         # If instance exists and completed
         if crawl_instance.status == 'COMPLETED':
             # Prepare the zip and return
-            zip_filename = os.path.join(settings.BASE_DIR, 'collect_data', f"{domain}.zip")
+            zip_filename = os.path.join(settings.BASE_DIR, 'output', f"{domain}.zip")
             if not os.path.exists(zip_filename):
-                folder_path = os.path.join(settings.BASE_DIR, 'collect_data', domain)
+                folder_path = os.path.join(settings.BASE_DIR, 'output', domain)
                 with zipfile.ZipFile(zip_filename, 'w') as zipf:
                     for foldername, subfolders, filenames in os.walk(folder_path):
                         for filename in filenames:
@@ -43,7 +46,7 @@ def start_crawl(request):
         # Create a new crawl instance and start Scrapy
         crawl_instance = DomainCrawl.objects.create(domain=domain, hash_value=hash_value)
         # Start Scrapy spider via Celery
-        scrape_website.delay(domain, hash_value)
+        run_spider.delay(target_url, hash_value)
 
     return JsonResponse({"status": "RUNNING", "message": "Crawl started."})
 
