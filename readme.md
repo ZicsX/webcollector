@@ -90,9 +90,9 @@ Of course! Let's add a section on how to directly run the Scrapy spider without 
 If you'd like to bypass the Django application and run the Scrapy spider directly, you can use the following command:
 
 ```bash
-scrapy crawl async_spider -a url=YOUR_DOMAIN_HERE
+scrapy crawl website_crawler -a target_url="https://hi.wikiversity.org" -s JOBDIR=crawls=YOUR_DOMAIN_HERE
 ```
 
-Replace `YOUR_DOMAIN_HERE` with the domain you want to crawl. The extracted textual content will be saved in a folder named after the domain inside 'collect_data', and links will be saved in a `links.csv` file within the same folder.
+Replace `YOUR_DOMAIN_HERE` with the domain you want to crawl. The extracted textual content will be saved in a folder named after the domain inside 'collect_data', and links will be saved in a `log.csv` file within the same folder.
 
 ---
